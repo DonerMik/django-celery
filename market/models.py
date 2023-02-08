@@ -82,6 +82,16 @@ class SubscriptionManager(ProductContainerManager):
             Q(first_lesson_date__lte=edge_date) | Q(first_lesson_date__isnull=True, buy_date__lte=edge_date)
         )
 
+    def list_current_subscribe(self):
+        """
+        Find current subscriptions.
+        """
+        edge_date = timezone.now() - F('duration')
+        return self.get_queryset().filter(
+            is_fully_used=False,
+            first_lesson_date__gte=edge_date,
+            classes__isnull=False)
+
 
 class Subscription(ProductContainer):
     """
