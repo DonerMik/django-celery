@@ -29,7 +29,21 @@ class TestClassManager(TestCase):
             product=self.product,
             buy_price=150,
         )
+        self.subscription_2 = models.Subscription(
+            customer=self.customer,
+            product=self.product,
+            buy_price=150,
+            first_lesson_date='2032-11-02 12:00'
+        )
+        self.subscription_3 = models.Subscription(
+            customer=self.customer,
+            product=self.product,
+            buy_price=150,
+            first_lesson_date='2032-11-02 12:00'
+        )
         self.subscription.save()
+        self.subscription_2.save()
+        self.subscription_3.save()
 
     def _schedule(self, lesson_type=None, date=None):
         if date is None:
@@ -198,3 +212,13 @@ class TestClassManager(TestCase):
         self.subscription.save()
 
         self.assertEqual(models.Subscription.objects.due().count(), 0)
+
+    def test_list_current_subscribe(self):
+        """
+       Checking the change in subscribers after adding new subscriptions by indicating the date of the first lesson.
+       Сhecking subscriptions after expiration
+        """
+
+        self.assertEqual(models.Subscription.objects.list_current_subscribe().count(), 20)
+        with freeze_time('2032-11-08 12:00'):
+            self.assertEqual(models.Subscription.objects.list_current_subscribe().count(), 0)
